@@ -1,0 +1,152 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "title": "Pipeline Runs (Total)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(legalops_pipeline_runs_total)",
+          "legendFormat": "Total"
+        }
+      ]
+    },
+    {
+      "title": "Active Pipelines",
+      "type": "gauge",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "legalops_pipeline_active_runs",
+          "legendFormat": "Active"
+        }
+      ]
+    },
+    {
+      "title": "Pending HITL Tasks",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "legalops_hitl_pending_tasks",
+          "legendFormat": "Pending"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 15 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Active Escalations",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "expr": "legalops_escalations_active",
+          "legendFormat": "Active"
+        }
+      ]
+    },
+    {
+      "title": "Pipeline Duration (p50 / p95 / p99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, rate(legalops_pipeline_duration_seconds_bucket[5m]))", "legendFormat": "p50" },
+        { "expr": "histogram_quantile(0.95, rate(legalops_pipeline_duration_seconds_bucket[5m]))", "legendFormat": "p95" },
+        { "expr": "histogram_quantile(0.99, rate(legalops_pipeline_duration_seconds_bucket[5m]))", "legendFormat": "p99" }
+      ]
+    },
+    {
+      "title": "LLM Latency (p50 / p95)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, rate(legalops_llm_latency_seconds_bucket[5m]))", "legendFormat": "p50" },
+        { "expr": "histogram_quantile(0.95, rate(legalops_llm_latency_seconds_bucket[5m]))", "legendFormat": "p95" }
+      ]
+    },
+    {
+      "title": "Requests by Category",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "expr": "sum by (category) (legalops_classifier_predictions_total)",
+          "legendFormat": "{{category}}"
+        }
+      ]
+    },
+    {
+      "title": "Agent Node Errors Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 12 },
+      "targets": [
+        {
+          "expr": "sum by (node_name) (rate(legalops_agent_node_errors_total[5m]))",
+          "legendFormat": "{{node_name}}"
+        }
+      ]
+    },
+    {
+      "title": "LLM Tokens Consumed (5m rate)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 12 },
+      "targets": [
+        {
+          "expr": "sum by (token_type) (rate(legalops_llm_tokens_total[5m]))",
+          "legendFormat": "{{token_type}}"
+        }
+      ]
+    },
+    {
+      "title": "HTTP Request Rate & Errors",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "targets": [
+        { "expr": "sum(rate(legalops_http_requests_total[5m]))", "legendFormat": "Total RPS" },
+        { "expr": "sum(rate(legalops_http_requests_total{status_code=~\"5..\"}[5m]))", "legendFormat": "5xx RPS" }
+      ]
+    },
+    {
+      "title": "SLA Breaches",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "targets": [
+        {
+          "expr": "sum(legalops_hitl_sla_breaches_total)",
+          "legendFormat": "Breaches"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["legalops", "pipeline"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "LegalOps Pipeline Overview",
+  "uid": "legalops-pipeline-overview"
+}
